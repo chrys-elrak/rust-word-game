@@ -1,14 +1,11 @@
-use crate::read_data::read_input;
-use crate::word::{GameType::French, WordGameApp};
+use app::{game as Game};
 
 mod read_data;
+mod enums;
 mod word;
+mod app;
 
 fn main() {
-    // println!("Let' s play game\nYou have to find the word in french\nYou have 5 chances\nGood luck");
-    let mut main = WordGameApp::new(French);
-    let find_me = main.word.format(None);
-    println!("{}, {:?}", find_me, main.to_find);
-    let user_input = read_input("Enter your word: ");
-    println!("{} => {}", user_input, main.to_find.contains(&user_input));
+    println!("Let' s play game\nYou have to find the word in french\nYou have 5 chances\nGood luck");
+    Game::run();
 }
