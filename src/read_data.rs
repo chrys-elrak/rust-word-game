@@ -24,5 +24,5 @@ pub fn read_input(prompt_message: &str) -> String {
     print!("{}", prompt_message);
     io::stdout().flush().unwrap();
     io::stdin().read_line(&mut input).unwrap();
-    input.trim().to_string()
+    input.trim().to_lowercase().to_string()
 }
