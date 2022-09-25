@@ -1,8 +1,7 @@
 use rand::Rng;
 use std::collections::HashMap;
-
 use crate::enums::game_type::GameType;
-use crate::read_data::{read_input, read_json};
+use crate::read_data::{read_json};
 use crate::word::Word;
 
 pub struct App {
@@ -18,6 +17,10 @@ impl App {
         self.bonus = new_value;
     }
 
+    pub fn get_bonus(&self) -> &Vec<String> {
+        &self.bonus
+    }
+
     pub fn update_score(&mut self, new_value: f32) {
         self.score += new_value;
     }
@@ -26,7 +29,7 @@ impl App {
         self.score
     }
 
-    fn check(&mut self, text: &String) -> bool {
+    pub fn check(&mut self, text: &String) -> bool {
         let correct = self
             .bonus
             .iter()
@@ -60,7 +63,7 @@ impl App {
     }
 
     fn get_results(&mut self) {
-        let word = self.word.0.to_lowercase().to_string();
+        let word = self.word.get_string().to_lowercase().to_string();
         let mut results: Vec<String> = vec![];
         for text in self.data.clone() {
             let mut tmp: HashMap<String, Vec<char>> = HashMap::new();
@@ -103,44 +106,5 @@ impl App {
     pub fn reset(&mut self) {
         self.generate_random();
         self.get_results();
-    }
-}
-
-pub mod game {
-    use super::{read_input, App};
-    use crate::enums::game_type::parse_game_type;
-
-    pub fn run() {
-        let lang = read_input("Choose your lang: ");
-        let mut main = App::new(parse_game_type(lang.as_str()));
-        let find_me = main.word.format(Some('*'));
-        loop {
-            println!(
-                "{}: {:?} => {}\nSCORE: {}",
-                find_me,
-                main.bonus,
-                main.response,
-                main.get_score()
-            );
-            let user_input = read_input("Enter your word: ");
-            if main.check(&user_input) {
-                main.set_bonus(
-                    main.bonus
-                        .iter()
-                        .filter(|&x| x != &user_input)
-                        .map(|x| x.to_string())
-                        .collect(),
-                );
-            }
-            if user_input == main.response {
-                main.update_score(1.0);
-                println!("You win with {}", main.get_score());
-                let user_input = read_input("Continue? (y/n) ");
-                if user_input == "n" {
-                    break;
-                }
-                main.reset();
-            }
-        }
     }
 }
