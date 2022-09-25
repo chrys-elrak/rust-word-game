@@ -27,14 +27,19 @@ impl App {
     }
 
     fn check(&mut self, text: &String) -> bool {
-        let correct = self.bonus.contains(&text);
+        let correct = self
+            .bonus
+            .iter()
+            .map(|x| x.to_lowercase())
+            .collect::<Vec<String>>()
+            .contains(&text.to_lowercase());
         if correct {
             self.update_score(0.5);
         }
         correct
     }
 
-    fn new(game_type: GameType) -> Self {
+    pub fn new(game_type: GameType) -> Self {
         let path = match game_type {
             GameType::Malagasy => "src/assets/ohabolana.json",
             GameType::French => "src/assets/mots.json",
@@ -49,7 +54,7 @@ impl App {
             data: read_json(path),
             response: String::new(),
         };
-        _self.get_random();
+        _self.generate_random();
         _self.get_results();
         _self
     }
@@ -72,28 +77,37 @@ impl App {
                 }
             }
         }
+        self.set_bonus(results);
+    }
+
+    #[allow(dead_code)]
+    fn update_bonus_word(&self, data: Vec<String>) {
         let mut rng = rand::thread_rng();
         let mut i = 0;
-        while i < rng.gen_range(0..results.len()) {
-            if self.bonus.len() < 3 {
-                self.bonus.push(results[i].clone());
+        let mut bonus = Vec::new();
+        while i < rng.gen_range(0..data.len()) {
+            if bonus.len() < 3 {
+                bonus.push(data[i].clone());
             }
             i += 1;
         }
     }
 
-    fn get_random(&mut self) {
-        if self.response.is_empty() {
-            let mut rng = rand::thread_rng();
-            let i = rng.gen_range(0..self.data.len());
-            self.word = Word::new(self.data[i].as_str());
-            self.response = self.data[i].clone();
-        }
+    fn generate_random(&mut self) {
+        let mut rng = rand::thread_rng();
+        let i = rng.gen_range(0..self.data.len());
+        self.word = Word::new(self.data[i].as_str());
+        self.response = self.data[i].to_lowercase();
+    }
+
+    pub fn reset(&mut self) {
+        self.generate_random();
+        self.get_results();
     }
 }
 
 pub mod game {
-    use super::{App, read_input};
+    use super::{read_input, App};
     use crate::enums::game_type::parse_game_type;
 
     pub fn run() {
@@ -101,7 +115,13 @@ pub mod game {
         let mut main = App::new(parse_game_type(lang.as_str()));
         let find_me = main.word.format(Some('*'));
         loop {
-            println!("{}: {:?} => {}\nSCORE: {}", find_me, main.bonus, main.response, main.get_score());
+            println!(
+                "{}: {:?} => {}\nSCORE: {}",
+                find_me,
+                main.bonus,
+                main.response,
+                main.get_score()
+            );
             let user_input = read_input("Enter your word: ");
             if main.check(&user_input) {
                 main.set_bonus(
@@ -115,7 +135,11 @@ pub mod game {
             if user_input == main.response {
                 main.update_score(1.0);
                 println!("You win with {}", main.get_score());
-                break;
+                let user_input = read_input("Continue? (y/n) ");
+                if user_input == "n" {
+                    break;
+                }
+                main.reset();
             }
         }
     }
