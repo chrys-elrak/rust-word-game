@@ -1,12 +1,14 @@
 use rand::Rng;
 use std::collections::HashMap;
+use unicode_segmentation::UnicodeSegmentation;
+
 use crate::enums::game_type::GameType;
-use crate::read_data::{read_json};
+use crate::read_data::read_json;
 use crate::word::Word;
 
 pub struct App {
     data: Vec<String>,
-    bonus: Vec<String>,
+    bonus_words: Vec<String>,
     score: f32,
     pub word: Word,
     pub response: String,
@@ -14,11 +16,15 @@ pub struct App {
 
 impl App {
     pub fn set_bonus(&mut self, new_value: Vec<String>) {
-        self.bonus = new_value;
+        self.bonus_words = new_value;
+    }
+
+    pub fn remove_from_bonus(&mut self, value: &str) {
+        self.bonus_words.retain(|x| x != value);
     }
 
     pub fn get_bonus(&self) -> &Vec<String> {
-        &self.bonus
+        &self.bonus_words
     }
 
     pub fn update_score(&mut self, new_value: f32) {
@@ -31,7 +37,7 @@ impl App {
 
     pub fn check(&mut self, text: &String) -> bool {
         let correct = self
-            .bonus
+            .bonus_words
             .iter()
             .map(|x| x.to_lowercase())
             .collect::<Vec<String>>()
@@ -52,7 +58,7 @@ impl App {
         };
         let mut _self = Self {
             score: 0.0,
-            bonus: vec![],
+            bonus_words: vec![],
             word: Word::new(""),
             data: read_json(path),
             response: String::new(),
@@ -61,13 +67,17 @@ impl App {
         _self.get_results();
         _self
     }
-
+    /*
+        Get the possible results from the word
+    */
     fn get_results(&mut self) {
         let word = self.word.get_string().to_lowercase().to_string();
         let mut results: Vec<String> = vec![];
+
         for text in self.data.clone() {
-            let mut tmp: HashMap<String, Vec<char>> = HashMap::new();
-            for charset in text.chars() {
+            let mut tmp: HashMap<String, Vec<&str>> = HashMap::new();
+
+            for charset in text.graphemes(true) {
                 if word.contains(charset) {
                     tmp.entry(text.clone()).or_insert(vec![]);
                     let arr = tmp.get_mut(&text).unwrap();
@@ -99,8 +109,9 @@ impl App {
     fn generate_random(&mut self) {
         let mut rng = rand::thread_rng();
         let i = rng.gen_range(0..self.data.len());
-        self.word = Word::new(self.data[i].as_str());
         self.response = self.data[i].to_lowercase();
+        self.word = Word::new(self.data[i].as_str());
+        self.word.shuffle();
     }
 
     pub fn reset(&mut self) {

@@ -16,13 +16,7 @@ pub fn run() {
         );
         let user_input = read_input("Enter your word: ");
         if main.check(&user_input) {
-            main.set_bonus(
-                main.get_bonus()
-                    .iter()
-                    .filter(|&x| x != &user_input)
-                    .map(|x| x.to_string())
-                    .collect(),
-            );
+            main.remove_from_bonus(user_input.as_str());
         }
         if user_input == main.response {
             main.update_score(1.0);
