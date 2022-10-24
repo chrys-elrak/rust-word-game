@@ -1,4 +1,4 @@
-use rand::Rng;
+use rand::{seq::SliceRandom};
 pub struct Word(String);
 
 impl Word {
@@ -15,13 +15,11 @@ impl Word {
     }
 
     fn shuffle(&mut self) {
-        let mut shuffled_word = String::new();
         let mut rng = rand::thread_rng();
-        while self.get_string().len() > 0 {
-            let index = rng.gen_range(0..self.get_string().len());
-            shuffled_word.push(self.get_string().to_string().remove(index));
-        }
-        self.set_string(shuffled_word.to_uppercase().as_str());
+        let mut word: Vec<_> = self.get_string().chars().collect();
+        word.shuffle(&mut rng);
+        let shuffled: String = word.into_iter().collect();
+        self.set_string(shuffled.as_str());
     }
 
     pub fn format(&mut self, separator: Option<char>) -> String {
