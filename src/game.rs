@@ -4,7 +4,7 @@ use crate::read_data::read_input;
 
 pub fn run() {
     let lang = read_input("Make your choice (malagasy/french): ");
-    let mut main = App::new(parse_game_type(lang.as_str()));
+    let mut main = App::new(parse_game_type(lang));
     let find_me = main.word.format(Some('*'));
     loop {
         println!(
