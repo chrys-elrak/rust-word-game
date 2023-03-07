@@ -6,10 +6,6 @@ impl Word {
     pub fn new(word: &str) -> Self {
         Self(word.to_string())
     }
-    #[allow(dead_code)]
-    pub fn to_word(&self) -> &str {
-        &self.0
-    }
 
     pub fn get_string(&self) -> &str {
         &self.0
