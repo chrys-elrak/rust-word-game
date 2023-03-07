@@ -8,16 +8,14 @@ pub fn run() {
     let find_me = main.word.format(Some('*'));
     loop {
         println!(
-            "{}: {:?} => {}\nSCORE: {}",
+            ">>{}<<\nSCORE: {}",
             find_me,
-            main.get_bonus(),
-            main.response,
             main.get_score()
         );
+        // dbg!(main.get_bonus());
+        dbg!(&main.response);
         let user_input = read_input("Enter your word: ");
-        if main.check(&user_input) {
-            main.remove_from_bonus(user_input.as_str());
-        }
+        main.check_bonus(&user_input.to_lowercase(), 0.5);
         if user_input == main.response {
             main.update_score(1.0);
             println!("You win with {}", main.get_score());

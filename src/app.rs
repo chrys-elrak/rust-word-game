@@ -23,10 +23,6 @@ impl App {
         self.bonus_words.retain(|x| x != value);
     }
 
-    pub fn get_bonus(&self) -> &Vec<String> {
-        &self.bonus_words
-    }
-
     pub fn update_score(&mut self, new_value: f32) {
         self.score += new_value;
     }
@@ -35,15 +31,16 @@ impl App {
         self.score
     }
 
-    pub fn check(&mut self, text: &String) -> bool {
+    pub fn check_bonus(&mut self, text: &String, bonus_value: f32) -> bool {
         let correct = self
             .bonus_words
             .iter()
             .map(|x| x.to_lowercase())
             .collect::<Vec<String>>()
-            .contains(&text.to_lowercase());
+            .contains(&text);
         if correct {
-            self.update_score(0.5);
+            self.update_score(bonus_value);
+            self.remove_from_bonus(text.as_str());
         }
         correct
     }
@@ -56,54 +53,37 @@ impl App {
                 panic!("Not implemented yet");
             }
         };
-        let mut _self = Self {
+        let mut self_instance = Self {
             score: 0.0,
             bonus_words: vec![],
             word: Word::new(""),
             data: read_json(path),
             response: String::new(),
         };
-        _self.generate_random();
-        _self.get_results();
-        _self
+        self_instance.generate_random();
+        self_instance.get_bonus();
+        self_instance
     }
-    /*
-        Get the possible results from the word
-    */
-    fn get_results(&mut self) {
-        let word = self.word.get_string().to_lowercase().to_string();
+
+    fn get_bonus(&mut self) {
+        let word = self.word.get_string();
         let mut results: Vec<String> = vec![];
-
-        for text in self.data.clone() {
+        for text in self.data.iter() {
             let mut tmp: HashMap<String, Vec<&str>> = HashMap::new();
-
             for charset in text.graphemes(true) {
                 if word.contains(charset) {
                     tmp.entry(text.clone()).or_insert(vec![]);
-                    let arr = tmp.get_mut(&text).unwrap();
+                    let arr = tmp.get_mut(text).unwrap();
                     if !arr.contains(&charset) {
                         arr.push(charset);
                     }
-                    if text != word && text.len() == tmp.get(&text).unwrap().len() {
+                    if text.eq(&word) && text.len() == tmp.get(text).unwrap().len() {
                         results.push(text.clone());
                     }
                 }
             }
         }
         self.set_bonus(results);
-    }
-
-    #[allow(dead_code)]
-    fn update_bonus_word(&self, data: Vec<String>) {
-        let mut rng = rand::thread_rng();
-        let mut i = 0;
-        let mut bonus = Vec::new();
-        while i < rng.gen_range(0..data.len()) {
-            if bonus.len() < 3 {
-                bonus.push(data[i].clone());
-            }
-            i += 1;
-        }
     }
 
     fn generate_random(&mut self) {
@@ -116,6 +96,6 @@ impl App {
 
     pub fn reset(&mut self) {
         self.generate_random();
-        self.get_results();
+        self.get_bonus();
     }
 }
