@@ -49,7 +49,7 @@ impl App {
         let mut self_instance = Self {
             score: 0.0,
             bonus_words: vec![],
-            word: Word::new(""),
+            word: Word::from(String::new()),
             data: super::utils::read_json(path),
             response: String::new(),
         };
@@ -59,18 +59,20 @@ impl App {
     }
 
     fn get_bonus(&mut self) {
-        let word = self.word.get_string();
+        let word = self.word.get_string().to_lowercase().to_string();
         let mut results: Vec<String> = vec![];
-        for text in self.data.iter() {
+
+        for text in self.data.clone() {
             let mut tmp: HashMap<String, Vec<&str>> = HashMap::new();
+
             for charset in text.graphemes(true) {
                 if word.contains(charset) {
                     tmp.entry(text.clone()).or_insert(vec![]);
-                    let arr = tmp.get_mut(text).unwrap();
+                    let arr = tmp.get_mut(&text).unwrap();
                     if !arr.contains(&charset) {
                         arr.push(charset);
                     }
-                    if text.eq(&word) && text.len() == tmp.get(text).unwrap().len() {
+                    if text != word && text.len() == tmp.get(&text).unwrap().len() {
                         results.push(text.clone());
                     }
                 }
@@ -82,8 +84,8 @@ impl App {
     fn generate_random(&mut self) {
         let mut rng = rand::thread_rng();
         let i = rng.gen_range(0..self.data.len());
-        self.response = self.data[i].to_lowercase();
-        self.word = Word::new(self.data[i].as_str());
+        self.response = self.data[i].clone();
+        self.word = Word::from(self.data[i].clone());
         self.word.shuffle();
     }
 

@@ -3,8 +3,8 @@ use unicode_segmentation::UnicodeSegmentation;
 pub struct Word(String);
 
 impl Word {
-    pub fn new(word: &str) -> Self {
-        Self(word.to_string())
+    pub fn from(word: String) -> Self {
+        Self(word)
     }
 
     pub fn get_string(&self) -> String {
