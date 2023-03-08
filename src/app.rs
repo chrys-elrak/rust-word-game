@@ -2,7 +2,7 @@ use rand::Rng;
 use std::collections::HashMap;
 use unicode_segmentation::UnicodeSegmentation;
 
-use crate::enums::game_type::GameType;
+use crate::language::Languages;
 use crate::read_data::read_json;
 use crate::word::Word;
 
@@ -45,10 +45,10 @@ impl App {
         correct
     }
 
-    pub fn new(game_type: GameType) -> Self {
+    pub fn new(game_type: Languages) -> Self {
         let path = match game_type {
-            GameType::Malagasy => "src/assets/ohabolana.json",
-            GameType::French => "src/assets/mots.json",
+            Languages::Malagasy => "src/assets/ohabolana.json",
+            Languages::French => "src/assets/mots.json",
             _ => {
                 panic!("Not implemented yet");
             }

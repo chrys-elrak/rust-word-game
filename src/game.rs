@@ -1,10 +1,10 @@
 use crate::app::App;
-use crate::enums::game_type::parse_game_type;
+use crate::language::get;
 use crate::read_data::read_input;
 
 pub fn run() {
     let lang = read_input("Make your choice (malagasy/french): ");
-    let mut main = App::new(parse_game_type(lang));
+    let mut main = App::new(get(lang));
     let find_me = main.word.format(Some('*'));
     loop {
         println!(

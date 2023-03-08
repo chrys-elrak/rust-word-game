@@ -1,5 +1,5 @@
 mod read_data;
-mod enums;
+mod language;
 mod word;
 mod app;
 mod game;
