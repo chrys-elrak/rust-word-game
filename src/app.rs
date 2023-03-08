@@ -3,7 +3,6 @@ use std::collections::HashMap;
 use unicode_segmentation::UnicodeSegmentation;
 
 use crate::language::Languages;
-use crate::read_data::read_json;
 use crate::word::Word;
 
 pub struct App {
@@ -46,18 +45,12 @@ impl App {
     }
 
     pub fn new(game_type: Languages) -> Self {
-        let path = match game_type {
-            Languages::Malagasy => "src/assets/ohabolana.json",
-            Languages::French => "src/assets/mots.json",
-            _ => {
-                panic!("Not implemented yet");
-            }
-        };
+        let path = super::utils::get_path(game_type);
         let mut self_instance = Self {
             score: 0.0,
             bonus_words: vec![],
             word: Word::new(""),
-            data: read_json(path),
+            data: super::utils::read_json(path),
             response: String::new(),
         };
         self_instance.generate_random();

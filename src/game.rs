@@ -1,6 +1,6 @@
 use crate::app::App;
 use crate::language::get;
-use crate::read_data::read_input;
+use crate::utils::read_input;
 
 pub fn run() {
     let lang = read_input("Make your choice (malagasy/french): ");
