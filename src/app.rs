@@ -2,8 +2,7 @@ use rand::Rng;
 use std::collections::HashMap;
 use unicode_segmentation::UnicodeSegmentation;
 
-use crate::enums::game_type::GameType;
-use crate::read_data::read_json;
+use crate::language::Languages;
 use crate::word::Word;
 
 pub struct App {
@@ -15,11 +14,11 @@ pub struct App {
 }
 
 impl App {
-    pub fn set_bonus(&mut self, new_value: Vec<String>) {
+    fn set_bonus(&mut self, new_value: Vec<String>) {
         self.bonus_words = new_value;
     }
 
-    pub fn remove_from_bonus(&mut self, value: &str) {
+    fn remove_from_bonus(&mut self, value: &str) {
         self.bonus_words.retain(|x| x != value);
     }
 
@@ -45,19 +44,13 @@ impl App {
         correct
     }
 
-    pub fn new(game_type: GameType) -> Self {
-        let path = match game_type {
-            GameType::Malagasy => "src/assets/ohabolana.json",
-            GameType::French => "src/assets/mots.json",
-            _ => {
-                panic!("Not implemented yet");
-            }
-        };
+    pub fn new(game_type: Languages) -> Self {
+        let path = super::utils::get_path(game_type);
         let mut self_instance = Self {
             score: 0.0,
             bonus_words: vec![],
-            word: Word::new(""),
-            data: read_json(path),
+            word: Word::from(String::new()),
+            data: super::utils::read_json(path),
             response: String::new(),
         };
         self_instance.generate_random();
@@ -66,18 +59,20 @@ impl App {
     }
 
     fn get_bonus(&mut self) {
-        let word = self.word.get_string();
+        let word = self.word.get_string().to_lowercase().to_string();
         let mut results: Vec<String> = vec![];
-        for text in self.data.iter() {
+
+        for text in self.data.clone() {
             let mut tmp: HashMap<String, Vec<&str>> = HashMap::new();
+
             for charset in text.graphemes(true) {
                 if word.contains(charset) {
                     tmp.entry(text.clone()).or_insert(vec![]);
-                    let arr = tmp.get_mut(text).unwrap();
+                    let arr = tmp.get_mut(&text).unwrap();
                     if !arr.contains(&charset) {
                         arr.push(charset);
                     }
-                    if text.eq(&word) && text.len() == tmp.get(text).unwrap().len() {
+                    if text != word && text.len() == tmp.get(&text).unwrap().len() {
                         results.push(text.clone());
                     }
                 }
@@ -89,8 +84,8 @@ impl App {
     fn generate_random(&mut self) {
         let mut rng = rand::thread_rng();
         let i = rng.gen_range(0..self.data.len());
-        self.response = self.data[i].to_lowercase();
-        self.word = Word::new(self.data[i].as_str());
+        self.response = self.data[i].clone();
+        self.word = Word::from(self.data[i].clone());
         self.word.shuffle();
     }
 

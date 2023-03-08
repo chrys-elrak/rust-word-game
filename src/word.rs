@@ -3,8 +3,8 @@ use unicode_segmentation::UnicodeSegmentation;
 pub struct Word(String);
 
 impl Word {
-    pub fn new(word: &str) -> Self {
-        Self(word.to_string())
+    pub fn from(word: String) -> Self {
+        Self(word)
     }
 
     pub fn get_string(&self) -> String {
@@ -14,10 +14,7 @@ impl Word {
     fn set_string(&mut self, new_value: String) {
         self.0 = new_value;
     }
-    /*
-        Shuffle the position of the letters in the word
-        It mutate the word and return the new word
-    */
+
     pub fn shuffle(&mut self) -> String {
         let mut shuffled = String::new();
         let mut rng = rand::thread_rng();
@@ -33,13 +30,12 @@ impl Word {
     pub fn format(&mut self, separator: Option<char>) -> String {
         let mut word = String::new();
         // Check separator, if None, use space ` ` as default
-        let s = separator.unwrap_or(' ');
         let text = self.shuffle(); // shuffle the word
         // format the word with separator
-        for c in text.graphemes(true) {
+        for (_, c) in text.grapheme_indices(true){
             word.push_str(c);
-            word.push_str(c);
+            word.push(separator.unwrap_or(' '));
         }
-        word.trim_end_matches(s).to_string()
+        word.to_uppercase()
     }
 }
