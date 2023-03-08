@@ -32,10 +32,10 @@ impl Word {
         // Check separator, if None, use space ` ` as default
         let text = self.shuffle(); // shuffle the word
         // format the word with separator
-        for c in text.graphemes(true) {
+        for (_, c) in text.grapheme_indices(true){
             word.push_str(c);
             word.push(separator.unwrap_or(' '));
         }
-        word
+        word.to_uppercase()
     }
 }
