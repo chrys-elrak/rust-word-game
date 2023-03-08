@@ -14,11 +14,11 @@ pub struct App {
 }
 
 impl App {
-    pub fn set_bonus(&mut self, new_value: Vec<String>) {
+    fn set_bonus(&mut self, new_value: Vec<String>) {
         self.bonus_words = new_value;
     }
 
-    pub fn remove_from_bonus(&mut self, value: &str) {
+    fn remove_from_bonus(&mut self, value: &str) {
         self.bonus_words.retain(|x| x != value);
     }
 

@@ -15,7 +15,10 @@ pub fn run() {
         // dbg!(main.get_bonus());
         dbg!(&main.response);
         let user_input = read_input("Enter your word: ");
-        main.check_bonus(&user_input.to_lowercase(), 0.5);
+        let correct = main.check_bonus(&user_input.to_lowercase(), 0.5);
+        if correct {
+            println!("You find a bonus word");
+        }
         if user_input == main.response {
             main.update_score(1.0);
             println!("You win with {}", main.get_score());
