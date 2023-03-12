@@ -2,11 +2,13 @@ use rand::Rng;
 use unicode_segmentation::UnicodeSegmentation;
 pub struct Word(String);
 
-impl Word {
-    pub fn from(word: String) -> Self {
-        Self(word)
+impl From<String> for Word {
+    fn from(value: String) -> Self {
+        Self(value)
     }
+}
 
+impl Word {
     pub fn get_string(&self) -> String {
         self.0.to_lowercase().to_string()
     }
@@ -31,8 +33,8 @@ impl Word {
         let mut word = String::new();
         // Check separator, if None, use space ` ` as default
         let text = self.shuffle(); // shuffle the word
-        // format the word with separator
-        for (_, c) in text.grapheme_indices(true){
+                                   // format the word with separator
+        for (_, c) in text.grapheme_indices(true) {
             word.push_str(c);
             word.push(separator.unwrap_or(' '));
         }
